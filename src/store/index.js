@@ -6,13 +6,17 @@ Vue.use(Vuex, axios)
 
 const baseUrl = 'https://dvapi.tempest.app/api/v1'
 const login = '/auth/login'
-// ?order_by=start_time&include=client.jobRequest.jobType.user
+const jobsUrl = '/jobs?order_by=start_time&include=client.jobRequest.jobType.user'
+
 export default new Vuex.Store({
   state: {
     token: '',
     user: {},
     status: '',
-    error: {}
+    error: {},
+    page: 0,
+    per_page: 0,
+    jobs: []
   },
   mutations: {
     auth_request (state) {
@@ -35,6 +39,13 @@ export default new Vuex.Store({
     },
     store_token (state, token) {
       state.token = token
+    },
+    store_jobs (state, data) {
+      state.jobs = data
+    },
+    pagination (state, { page, perPage }) {
+      state.page = page
+      state.per_page = perPage
     }
   },
   actions: {
@@ -50,7 +61,7 @@ export default new Vuex.Store({
             const token = response.data.token
             const user = response.config.data
             localStorage.setItem('token', token)
-            axios.defaults.headers.common['Authorization'] = token
+            // axios.defaults.headers.common['Authorization'] = token
             commit('store_token', token)
             commit('auth_success', user)
             resolve(response)
@@ -67,6 +78,37 @@ export default new Vuex.Store({
         commit('logout')
         localStorage.removeItem('token')
         delete axios.defaults.headers.common['Authorization']
+        resolve()
+      })
+    },
+    jobs ({ commit }, page, perPage) {
+      return new Promise((resolve, reject) => {
+        commit('pagination', { page, perPage })
+        let pagination = `&per_page=${perPage}&page=${page}`
+        let myHeaders = new Headers()
+        myHeaders.append('Authorization: Bearer ' + localStorage.getItem('token'))
+        console.log(myHeaders)
+        axios({
+          url: baseUrl + jobsUrl + pagination,
+          method: 'GET',
+          headers: myHeaders
+        })
+          .then(response => {
+            console.log(response.data)
+            // const token = response.data.token
+            // const user = response.config.data
+            // localStorage.setItem('token', token)
+            // axios.defaults.headers.common['Authorization'] = token
+            commit('store_jobs', response.data)
+            // commit('auth_success', user)
+            resolve(response)
+          })
+          .catch(error => {
+            console.log(error.response)
+            // commit('auth_error', error)
+            // localStorage.removeItem('token')
+            reject(error)
+          })
         resolve()
       })
     }

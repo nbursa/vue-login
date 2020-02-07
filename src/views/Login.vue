@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <h2>Login</h2>
-    <form class="form" @submit.prevent="handleSubmit">
+    <form class="form" @submit.prevent="logIn">
       <div class="error" v-if="error.data && error.data.message">{{ error.data.message }}</div>
       <div class="email">
         <label for="email" class="label">Username</label>
@@ -50,7 +50,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit () {
+    logIn () {
       const { email, password } = this
       this.error = ''
       this.emailError = ''

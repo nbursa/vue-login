@@ -15,13 +15,8 @@ export default {
     }
   },
   computed: {
-    // path () {
-    //   // console.log(this.$router.currentRoute.path === '/jobs')
-    //   return this.$router.currentRoute.path === '/jobs' && this.$router.currentRoute.path === '/jobs'
-    // }
   },
   updated () {
-    // console.log(this.path)
   },
   methods: {
     logout () {
