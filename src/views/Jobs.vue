@@ -28,9 +28,6 @@ export default {
   created () {
     this.getJobs()
   },
-  updated () {
-    console.log(this.$store.state.page, this.$store.state.per_page)
-  },
   computed: {
     jobs () {
       return this.$store.state.jobs
@@ -58,6 +55,7 @@ export default {
   }
 }
 </script>
+
 <style lang="scss">
 .jobs {
   .empty {

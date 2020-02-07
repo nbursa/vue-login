@@ -7,12 +7,6 @@
 <script>
 export default {
   name: 'logout',
-  data () {
-    return {
-    }
-  },
-  computed: {
-  },
   created () {
     this.logout()
   },

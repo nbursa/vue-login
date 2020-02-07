@@ -43,18 +43,13 @@ export default {
       email: '',
       password: '',
       submitted: false,
-      error: '',
-      errorMessage: '',
-      emailError: '',
-      passwordError: ''
+      error: ''
     }
   },
   methods: {
     logIn () {
       const { email, password } = this
       this.error = ''
-      this.emailError = ''
-      this.passwordError = ''
       this.$store
         .dispatch('login', { email, password })
         .then(() => this.$router.push('/jobs'))

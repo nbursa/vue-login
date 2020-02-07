@@ -5,17 +5,11 @@
       <button class="button" @click="nextPage()">Next</button>
   </div>
 </template>
+
 <script>
 export default {
   name: 'pagination',
   props: ['page', 'perPage'],
-  data () {
-    return {
-    }
-  },
-  created () {
-    console.log('pagination props, ', this.$props.page, this.$props.perPage)
-  },
   methods: {
     nextPage () {
       this.$store.dispatch('jobs', { page: this.$props.page + 1, perPage: this.$props.perPage })
@@ -28,6 +22,7 @@ export default {
   }
 }
 </script>
+
 <style lang="scss">
 .pagination {
   display: flex;
