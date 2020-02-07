@@ -21,14 +21,10 @@ if (token) {
 router.beforeEach((to, from, next) => {
   const publicPages = ['/', '/logout']
   const authRequired = !publicPages.includes(to.path)
-  const loggedIn = store.getters.isLoggedIn
-  // console.log(store.state.token)
-  // console.log(store.state.user.email, store.state.user.password)
-  // console.log(store.state.user.error)
+  const loggedIn = localStorage.getItem('token')
   if (authRequired && !loggedIn) {
     console.log('Not authorised')
     return next('/')
   }
-
   next()
 })

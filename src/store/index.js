@@ -5,17 +5,17 @@ import axios from 'axios'
 Vue.use(Vuex, axios)
 
 const baseUrl = 'https://dvapi.tempest.app/api/v1'
-const login = '/auth/login'
-const jobsUrl = '/jobs?order_by=start_time&include=client.jobRequest.jobType.user'
+const loginUrl = '/auth/login'
+const jobsUrl = '/jobs?order_by=start_time&include=client.jobRequest,jobType.user'
 
 export default new Vuex.Store({
   state: {
-    token: '',
+    token: localStorage.getItem('token') || '',
     user: {},
     status: '',
     error: {},
-    page: 0,
-    per_page: 0,
+    page: 1,
+    per_page: 20,
     jobs: []
   },
   mutations: {
@@ -36,6 +36,8 @@ export default new Vuex.Store({
       state.token = ''
       state.error = {}
       state.user = {}
+      state.jobs = []
+      state.page = 1
     },
     store_token (state, token) {
       state.token = token
@@ -53,7 +55,7 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('auth_request')
         axios({
-          url: baseUrl + login,
+          url: baseUrl + loginUrl,
           data: { email, password },
           method: 'POST'
         })
@@ -61,7 +63,6 @@ export default new Vuex.Store({
             const token = response.data.token
             const user = response.config.data
             localStorage.setItem('token', token)
-            // axios.defaults.headers.common['Authorization'] = token
             commit('store_token', token)
             commit('auth_success', user)
             resolve(response)
@@ -77,36 +78,25 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('logout')
         localStorage.removeItem('token')
-        delete axios.defaults.headers.common['Authorization']
         resolve()
       })
     },
-    jobs ({ commit }, page, perPage) {
+    jobs ({ commit }, { page, perPage }) {
       return new Promise((resolve, reject) => {
         commit('pagination', { page, perPage })
-        let pagination = `&per_page=${perPage}&page=${page}`
-        let myHeaders = new Headers()
-        myHeaders.append('Authorization: Bearer ' + localStorage.getItem('token'))
-        console.log(myHeaders)
-        axios({
-          url: baseUrl + jobsUrl + pagination,
-          method: 'GET',
-          headers: myHeaders
+        let pagination = '&per_page=' + perPage + '&page=' + page
+        let url = baseUrl + jobsUrl + pagination
+        axios.get(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
         })
           .then(response => {
-            console.log(response.data)
-            // const token = response.data.token
-            // const user = response.config.data
-            // localStorage.setItem('token', token)
-            // axios.defaults.headers.common['Authorization'] = token
-            commit('store_jobs', response.data)
-            // commit('auth_success', user)
+            commit('store_jobs', response.data.data)
             resolve(response)
           })
           .catch(error => {
-            console.log(error.response)
-            // commit('auth_error', error)
-            // localStorage.removeItem('token')
             reject(error)
           })
         resolve()
@@ -115,7 +105,7 @@ export default new Vuex.Store({
   },
   modules: {},
   getters: {
-    isLoggedIn: state => state.token,
+    isLoggedIn: state => !!state.token,
     authStatus: state => state.status
   }
 })

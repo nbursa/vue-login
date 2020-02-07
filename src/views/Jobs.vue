@@ -1,8 +1,18 @@
 <template>
   <div class="jobs">
-    <h1>Employes</h1>
-    <div class="">{{ this.$store.state.jobs }}</div>
-    <!-- <pagination :page="page" :perPage="perPage"></pagination> -->
+    <h1 class="jobs-title">Jobs</h1>
+    <div class="jobs-list" v-if="!loading && jobs.length">
+      <div class="jobs-list-item" v-for="(job, index) in jobs" :key="index">
+        <div class="user-name">User Name{{  }}</div>
+        <div class="job-name">Job Name{{  }}</div>
+        <div class="client-name">{{ job.client.name }}</div>
+        <div class="start-time">{{ job.start_time }}</div>
+        <div class="end-time">{{ job.end_time }}</div>
+      </div>
+    </div>
+    <h2 class="empty" v-if="!jobs.length">No results</h2>
+    <h2 class="loader" v-if="loading">Loading...</h2>
+    <pagination v-if="jobs.length" :page="page" :perPage="perPage"></pagination>
   </div>
 </template>
 
@@ -12,37 +22,35 @@ export default {
   name: 'jobs',
   data () {
     return {
-      page: 1,
-      perPage: 20
+      loading: true
     }
   },
   created () {
-    console.log(this.$store.state.jobs, this.$store.state.page, this.$store.state.per_page)
     this.getJobs()
   },
   updated () {
     console.log(this.$store.state.page, this.$store.state.per_page)
   },
   computed: {
-    // page () {
-    //   return this.$store.state.page
-    // },
-    // perPage () {
-    //   return this.$store.state.per_page
-    // }
+    jobs () {
+      return this.$store.state.jobs
+    },
+    page () {
+      return this.$store.state.page
+    },
+    perPage () {
+      return this.$store.state.per_page
+    }
   },
   methods: {
     getJobs () {
-      // const { email, password } = this
-      // this.error = ''
-      // this.emailError = ''
-      // this.passwordError = ''
+      this.loading = true
       this.$store
-        .dispatch('jobs', this.page, this.perPage)
-        // .then(() => this.$router.push('/jobs'))
+        .dispatch('jobs', { page: this.page, perPage: this.perPage })
         .catch(err => {
-          this.error = err.response
+          console.log(err)
         })
+      this.loading = false
     }
   },
   components: {
@@ -50,3 +58,26 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.jobs {
+  .empty {
+    margin: 100px auto;
+  }
+  .loader {
+    margin: 100px auto;
+  }
+  &-list {
+    &-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      &:nth-child(odd) {
+        background-color: lightgray;
+      }
+      > div {
+        display: inline-block;
+      }
+    }
+  }
+}
+</style>

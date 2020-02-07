@@ -10,17 +10,8 @@
 
 <script>
 export default {
-  data () {
-    return {
-    }
-  },
-  computed: {
-  },
-  updated () {
-  },
   methods: {
     logout () {
-      console.log('loging out')
       this.$store.dispatch('logout')
         .then(() => this.$router.push('/logout'))
         .catch(err => console.log(err))
