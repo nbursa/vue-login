@@ -85,10 +85,9 @@ export default new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('pagination', { page, perPage })
         let pagination = '&per_page=' + perPage + '&page=' + page
-        let url = baseUrl + jobsUrl + pagination
+        const url = baseUrl + jobsUrl + pagination
         axios.get(url, {
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token')
           }
         })
